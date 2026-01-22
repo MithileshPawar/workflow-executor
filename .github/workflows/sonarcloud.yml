@@ -32,7 +32,7 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-	types: [opened, synchronize, reopened]
+    branches: [ "main" ]  
   workflow_dispatch:
 
 permissions:
@@ -46,12 +46,11 @@ jobs:
       with:
         # Disabling shallow clones is recommended for improving the relevancy of reporting
         fetch-depth: 0
-    
-	- name: SonarQube Scan  
+    - name: SonarQube Scan
       uses: SonarSource/sonarqube-scan-action@v7.0.0
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
+      env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}   # Generate a token on Sonarcloud.io, add it to the secrets of this repo with the name SONAR_TOKEN (Settings > Secrets > Actions > add new repository secret)
+      with:
           # Additional arguments for the SonarScanner CLI
           args:
             # Unique keys of your project and organization. You can find them in SonarCloud > Information (bottom-left menu)
