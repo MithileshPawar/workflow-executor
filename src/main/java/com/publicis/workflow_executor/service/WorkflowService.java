@@ -1,34 +1,54 @@
 package com.publicis.workflow_executor.service;
 
-import com.publicis.workflow_executor.dto.WorkflowDto;
+import com.publicis.workflow_executor.dto.WorkflowRequestDto;
+import com.publicis.workflow_executor.dto.WorkflowResponseDto;
 import com.publicis.workflow_executor.model.Workflow;
 import com.publicis.workflow_executor.repository.WorkflowRepository;
+import com.publicis.workflow_executor.util.WorkflowMapper;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class WorkflowService {
 
+
     private final WorkflowRepository workflowRepository;
+    private final WorkflowMapper workflowMapper;
 
-    public WorkflowService(WorkflowRepository workflowRepository) {
-        this.workflowRepository = workflowRepository;
+    public WorkflowResponseDto createWorkflow(WorkflowRequestDto workflowRequestDto) {
+
+        Workflow workflow = workflowMapper.toWorkflow(workflowRequestDto);
+        workflow.setStatus(STATUS.PENDING.toString());
+
+        Workflow createdWorkflow = workflowRepository.save(workflow);
+        return workflowMapper.toDto(createdWorkflow);
     }
 
-    public WorkflowDto createWorkflow(WorkflowDto workflowDto) {
-        Workflow workflow = workflowRepository.save(new Workflow());
-        return new WorkflowDto();
-    }
-
-    public List<WorkflowDto> getAllWorkflows() {
+    public List<WorkflowResponseDto> getAllWorkflows() {
         List<Workflow> workflows = workflowRepository.findAll();
-        return List.of(new WorkflowDto());
+
+        List<WorkflowResponseDto> workflowResponseDtos = workflows.stream().map((workflow) -> workflowMapper.toDto(workflow)).toList();
+        return workflowResponseDtos;
     }
 
-    public WorkflowDto getWorkflowById(Long id) {
-        Workflow workflow = workflowRepository.findById(id).orElseThrow(NoSuchElementException::new);
-        return new WorkflowDto();
+    public WorkflowResponseDto getWorkflowById(Long id) {
+        Workflow workflow = workflowRepository.findById(id).orElse(new Workflow());
+
+        WorkflowResponseDto workflowResponseDto = workflowMapper.toDto(workflow);
+        return workflowResponseDto;
+    }
+
+    private enum STATUS {
+        PENDING,
+        CANCELLED,
+        COMPLETED
     }
 }
