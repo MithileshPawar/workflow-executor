@@ -16,7 +16,7 @@ Maven 3.8+
 ## API Endpoints
 
 <details>
- <summary><code>GET</code><code>//workflows/{id}</code></summary>
+ <summary><code>GET</code><code>/workflows/{id}</code></summary>
 
 ##### Description
 
